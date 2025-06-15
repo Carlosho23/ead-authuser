@@ -24,7 +24,7 @@ public record UserRecordDto(@NotBlank(groups = UserView.RegistrationPost.class, 
 
                             @NotBlank(groups = UserView.PasswordPut.class, message = "Old is mandatory")
                             @Size(min = 6, max = 20,groups = UserView.PasswordPut.class, message = "Size must be between 6 and 20")
-                            @PasswordConstraint(groups = {UserView.RegistrationPost.class, UserView.PasswordPut.class})
+                            @PasswordConstraint(groups = {UserView.PasswordPut.class})
                             @JsonView(UserView.PasswordPut.class)
                             String oldPassword,
 
