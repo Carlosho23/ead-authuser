@@ -94,4 +94,11 @@ public class UserServiceImpl implements UserService {
     public Page<UserModel> findAll(Specification<UserModel> spec, Pageable pageable) {
         return userRepository.findAll(spec, pageable);
     }
+
+    @Override
+    public UserModel registerInstructor(UserModel userModel) {
+        userModel.setUserType(UserType.INSTITUTION);
+        userModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+        return userRepository.save(userModel);
+    }
 }
