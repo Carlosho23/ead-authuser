@@ -37,10 +37,26 @@ public class CourseClient {
             return restClient.get()
                     .uri(url)
                     .retrieve()
-                    .body(new ParameterizedTypeReference<ResponsePageDto<CourseRecordDto>>() {});
+                    .body(new ParameterizedTypeReference<ResponsePageDto<CourseRecordDto>>() {
+                    });
         } catch (RestClientException e) {
             log.error("Error Request RestClient with couse: {} ", e.getMessage());
             throw new RuntimeException("Error Request RestClient: ", e);
+        }
+    }
+
+    public void deleteUserCourseInCourse(UUID userId) {
+        String url = baseUrlCourse + "/courses/users/" + userId;
+        log.debug("Request URL: {}", url);
+
+        try {
+            restClient.delete()
+                    .uri(url)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (RestClientException e) {
+            log.error("Error Request DELETE RestClient with couse: {} ", e.getMessage());
+            throw new RuntimeException("Error Request DELETE RestClient: ", e);
         }
     }
 }
