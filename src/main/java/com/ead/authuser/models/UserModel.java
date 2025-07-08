@@ -1,5 +1,7 @@
 package com.ead.authuser.models;
 
+import com.ead.authuser.dtos.UserEventDto;
+import com.ead.authuser.enums.ActionType;
 import com.ead.authuser.enums.UserStatus;
 import com.ead.authuser.enums.UserType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serial;
@@ -82,5 +85,14 @@ public class UserModel extends RepresentationModel<UserModel> implements Seriali
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
+
+    public UserEventDto convertUserEventDto(ActionType actionType) {
+        var userEventDto = new UserEventDto();
+        BeanUtils.copyProperties(actionType, userEventDto);
+        userEventDto.setUserType(this.getUserType().toString());
+        userEventDto.setUserStatus(this.getUserStatus().toString());
+        userEventDto.setActionType(actionType.toString());
+        return userEventDto;
     }
 }
