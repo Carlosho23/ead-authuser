@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RefreshScopeController {
 
-    @Value("${authser.refreshscope.name}")
+    @Value("${authuser.refresdscope.name}")
     private String name;
 
-    @RequestMapping("/refreshscope")
+    @RequestMapping("/refresdscope")
     public String refreshScope() {
         return this.name;
     }
