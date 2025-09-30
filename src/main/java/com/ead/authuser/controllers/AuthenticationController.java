@@ -1,13 +1,21 @@
 package com.ead.authuser.controllers;
 
+import com.ead.authuser.configs.security.JwtProvider;
+import com.ead.authuser.dtos.JwtRecordDto;
+import com.ead.authuser.dtos.LoginRecordDto;
 import com.ead.authuser.dtos.UserRecordDto;
 import com.ead.authuser.services.UserService;
 import com.ead.authuser.validations.UserValidator;
 import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +29,8 @@ public class AuthenticationController {
     final UserService userService;
 
     final UserValidator userValidator;
+    final AuthenticationManager authenticationManager;
+    final JwtProvider jwtProvider;
 
     @PostMapping("/signup")
     public ResponseEntity<Object> registerUser(@RequestBody @Validated(UserRecordDto.UserView.RegistrationPost.class)
@@ -33,6 +43,17 @@ public class AuthenticationController {
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(userRecordDto));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtRecordDto> authenticateUser(@RequestBody @Valid LoginRecordDto loginRecordDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRecordDto.username(), loginRecordDto.password()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new JwtRecordDto(jwtProvider.generateJwt(authentication)));
+
+    }
+
 
     @GetMapping("/logs")
     public String index() {
