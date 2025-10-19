@@ -16,6 +16,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +32,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class UserController {
 
     final UserService userService;
-
     final AuthenticationCurrentUserService authenticationCurrentUserService;
+    final PasswordEncoder passwordEncoder;
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
@@ -83,7 +84,7 @@ public class UserController {
                                                  @JsonView(UserRecordDto.UserView.PasswordPut.class) UserRecordDto userRecordDto) {
         log.debug("PUT updatePassword userId received: {}", userId);
         var userModel = userService.findById(userId).get();
-        if (!userModel.getPassword().equals(userRecordDto.oldPassword())) {
+        if (!passwordEncoder.matches(userRecordDto.oldPassword(), userModel.getPassword())) {
             log.warn("Mismatched old password! userId: {}", userId);
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Mismatched old password.");
         }
